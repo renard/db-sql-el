@@ -5,14 +5,16 @@
 ;; Author: Sebastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 ;; Keywords: emacs, tramp, sql
 ;; Created: 2010-12-17
-;; Last changed: 2010-12-21 14:30:49
+;; Last changed: 2010-12-21 14:35:39
 ;; Licence: WTFPL, grab your copy here: http://sam.zoy.org/wtfpl/
 
 ;; This file is NOT part of GNU Emacs.
 
 ;;; Commentary:
 ;; 
-
+;; Connect to remote database using a tramp syntax.
+;;
+;; For this to work ssh should be correctly configured.
 
 ;;; Code:
 
