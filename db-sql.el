@@ -29,10 +29,11 @@ database.")
 
 (dolist (type (mapcar 'car sql-product-alist))
   (fset (intern (concat "db-sql-" (symbol-name type)))
-	`(lambda (host)
+	`(lambda (&optional host)
 	   "Connect to database on HOST.
 See `db-sql' for further information."
-	   (db-sql ,type host))))
+	   (interactive)
+	   (db-sql (quote ,type) host))))
 
 (defun db-sql (&optional type host)
   "Connect to sql database as defined by TYPE on server HOST.
