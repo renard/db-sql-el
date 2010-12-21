@@ -5,7 +5,7 @@
 ;; Author: Sebastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 ;; Keywords: emacs, tramp, sql
 ;; Created: 2010-12-17
-;; Last changed: 2010-12-20 09:32:59
+;; Last changed: 2010-12-21 14:30:49
 ;; Licence: WTFPL, grab your copy here: http://sam.zoy.org/wtfpl/
 
 ;; This file is NOT part of GNU Emacs.
@@ -21,75 +21,26 @@
 
 (defcustom db-sql-workdirs
   '((postgres "/sudo:postgres@%s:"))
-  "ALIST defining the working directories.")
+  "ALIST defining the working directories used to connect to a
+database.")
 
-(defun db-sql-ansi (&optional host)
-  "Connect to Ansi database on HOST."
-  (interactive)
-  (db-sql 'ansi host))
-
-(defun db-sql-db2 (&optional host)
-  "Connect to DB2 database on HOST."
-  (interactive)
-  (db-sql 'db2 host))
-
-(defun db-sql-informix (&optional host)
-  "Connect to Informix database on HOST."
-  (interactive)
-  (db-sql 'informix host))
-
-(defun db-sql-ingres (&optional host)
-  "Connect to Ingres database on HOST."
-  (interactive)
-  (db-sql 'ingres host))
-
-(defun db-sql-interbase (&optional host)
-  "Connect to Interbase database on HOST."
-  (interactive)
-  (db-sql 'interbase host))
-
-(defun db-sql-linter (&optional host)
-  "Connect to Linter database on HOST."
-  (interactive)
-  (db-sql 'linter host))
-
-(defun db-sql-ms (&optional host)
-  "Connect to Ms database on HOST."
-  (interactive)
-  (db-sql 'ms host))
-
-(defun db-sql-mysql (&optional host)
-  "Connect to Mysql database on HOST."
-  (interactive)
-  (db-sql 'mysql host))
-
-(defun db-sql-oracle (&optional host)
-  "Connect to Oracle database on HOST."
-  (interactive)
-  (db-sql 'oracle host))
-
-(defun db-sql-postgres (&optional host)
-  "Connect to Postgres database on HOST."
-  (interactive)
-  (db-sql 'postgres host))
-
-(defun db-sql-solid (&optional host)
-  "Connect to Solid database on HOST."
-  (interactive)
-  (db-sql 'solid host))
-
-(defun db-sql-sqlite (&optional host)
-  "Connect to Sqlite database on HOST."
-  (interactive)
-  (db-sql 'sqlite host))
-
-(defun db-sql-sybase (&optional host)
-  "Connect to Sybase database on HOST."
-  (interactive)
-  (db-sql 'sybase host))
+(dolist (type (mapcar 'car sql-product-alist))
+  (fset (intern (concat "db-sql-" (symbol-name type)))
+	`(lambda (host)
+	   "Connect to database on HOST.
+See `db-sql' for further information."
+	   (db-sql ,type host))))
 
 (defun db-sql (&optional type host)
-  "Connect to sql database as defined by PATH."
+  "Connect to sql database as defined by TYPE on server HOST.
+
+Database types are defined in `sql-product-alist'.
+
+Wrapper functions such as `sql-db-postgres' or `sql-db-mysql' are
+also defined for quick access to `db-sql'.
+
+If some database access need a special work directory, it could
+be defined in `db-sql-workdirs'."
   (interactive)
   (let* ((type (or type
 		   (intern (completing-read
