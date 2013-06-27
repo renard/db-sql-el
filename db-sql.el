@@ -5,7 +5,7 @@
 ;; Author: Sebastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 ;; Keywords: emacs, tramp, sql
 ;; Created: 2010-12-17
-;; Last changed: 2013-06-27 11:40:17
+;; Last changed: 2013-06-27 12:07:25
 ;; Licence: WTFPL, grab your copy here: http://sam.zoy.org/wtfpl/
 
 ;; This file is NOT part of GNU Emacs.
@@ -88,12 +88,20 @@ be defined in `db-sql-workdirs'."
 	 (sql-buf (format "*SQL %s %s@%s %s*" type sql-user host sql-database)))
     ;; launch sql program on remote host.
     (message "(funcall %s %s)" func type)
-    (switch-to-buffer 
-     (funcall func type nil))
-    (rename-buffer sql-buf)
-    (set-process-sentinel (get-buffer-process (current-buffer))
-			  '(lambda (proc status)
-			     (when (eq (process-status proc) 'exit)
-			       (kill-buffer (process-buffer proc)))))))
+    (if (get-buffer sql-buf)
+	(switch-to-buffer sql-buf)
+      (switch-to-buffer 
+       (funcall func type nil))
+      (rename-buffer sql-buf)
+      (set-process-sentinel (get-buffer-process (current-buffer))
+			    '(lambda (proc change)
+			       (when (eq (process-status proc) 'exit)
+				 (let* ((status  (process-exit-status proc))
+					(buf (process-buffer proc))
+					(err (when (not (eq 0 status))
+					       (with-current-buffer buf
+						 (buffer-string)))))
+				   (kill-buffer buf)
+				   (when err (error err)))))))))
 
 (provide 'db-sql)
