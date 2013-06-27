@@ -5,7 +5,7 @@
 ;; Author: Sebastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 ;; Keywords: emacs, tramp, sql
 ;; Created: 2010-12-17
-;; Last changed: 2013-06-27 12:07:25
+;; Last changed: 2013-06-27 12:09:02
 ;; Licence: WTFPL, grab your copy here: http://sam.zoy.org/wtfpl/
 
 ;; This file is NOT part of GNU Emacs.
@@ -87,7 +87,6 @@ be defined in `db-sql-workdirs'."
 	 (func (intern (format "sql-comint-%s" type)))
 	 (sql-buf (format "*SQL %s %s@%s %s*" type sql-user host sql-database)))
     ;; launch sql program on remote host.
-    (message "(funcall %s %s)" func type)
     (if (get-buffer sql-buf)
 	(switch-to-buffer sql-buf)
       (switch-to-buffer 
