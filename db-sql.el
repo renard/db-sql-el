@@ -5,7 +5,7 @@
 ;; Author: Sebastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 ;; Keywords: emacs, tramp, sql
 ;; Created: 2010-12-17
-;; Last changed: 2010-12-21 14:49:52
+;; Last changed: 2013-06-27 11:37:31
 ;; Licence: WTFPL, grab your copy here: http://sam.zoy.org/wtfpl/
 
 ;; This file is NOT part of GNU Emacs.
@@ -26,6 +26,17 @@
   '((postgres "/sudo:postgres@%s:"))
   "ALIST defining the working directories used to connect to a
 database.")
+
+
+(defcustom db-sql-pathseparator "|"
+  "Character used as field separator for tramp URLs.
+
+URLs are formated as:
+
+  /user@host:dbuser|dbpasswd|database
+")
+
+
 
 (dolist (type (mapcar 'car sql-product-alist))
   (fset (intern (concat "db-sql-" (symbol-name type)))
@@ -67,16 +78,19 @@ be defined in `db-sql-workdirs'."
 	   (if wd
 	       (format wd host)
 	     (file-name-directory path)))
-	 (database (file-name-nondirectory path))
-	 (sql-buf (format "%s %s %s" type host database)))
+	 (tramp-path (split-string
+		      (tramp-file-name-localname path-v)
+		      db-sql-pathseparator))
+	 (sql-user (or (car tramp-path) ""))
+	 (sql-password (or (cadr tramp-path) "" ))
+	 (database (or (caddr tramp-path) ""))
+	 (func (intern (format "sql-comint-%s" type)))
+	 (sql-buf (format "*SQL %s %s %s*" type host database)))
     ;; launch sql program on remote host.
+    (message "(funcall %s %s)" func type)
     (switch-to-buffer 
-     (apply 'make-comint sql-buf
-	    (eval (plist-get db-set :sqli-program))
-	    nil
-	    (append 
-	     (eval (plist-get db-set :sqli-options))
-	     (list database))))
+     (funcall func type nil))
+    (rename-buffer sql-buf)
     (set-process-sentinel (get-buffer-process (current-buffer))
 			  '(lambda (proc status)
 			     (when (eq (process-status proc) 'exit)
