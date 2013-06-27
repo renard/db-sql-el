@@ -35,6 +35,7 @@ See `db-sql' for further information."
 	   (interactive)
 	   (db-sql (quote ,type) host))))
 
+;;;###autoload
 (defun db-sql (&optional type host)
   "Connect to sql database as defined by TYPE on server HOST.
 
