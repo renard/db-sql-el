@@ -50,8 +50,8 @@ be defined in `db-sql-workdirs'."
   (let* ((type (or type
 		   (intern (completing-read
 			    "SQL type: "
-			    (mapcar '(lambda(x)
-				       (symbol-name (car x)))
+			    (mapcar #'(lambda(x)
+					(symbol-name (car x)))
 				    sql-product-alist)
 			    nil t))))
 	 (db-set (cdr (assoc type sql-product-alist)))
